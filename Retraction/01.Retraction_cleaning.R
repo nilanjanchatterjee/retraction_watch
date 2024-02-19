@@ -1,12 +1,17 @@
 library(readxl)
 library(tidyverse)
 library(lubridate)
+library(cowplot)
 
-rtr_db <-read_xlsx("./Documents/Retraction/Data_life science_SB_12092023.xlsx")
+setwd("./Documents/Retraction")
+rtr_db <-read_xlsx("Data_life science_SB_12092023.xlsx")
 head(rtr_db)
 summary(rtr_db)
 
 country_db <-mosaic::tally(~ Reason, rtr_db)
+
+################################################################################################
+###### Pattern across countries
 
 cntry <-capture.output(cat(rtr_db$Country)) ###concatenate all country name together
 cntry1 <- gsub(";", " ", cntry)
@@ -21,21 +26,55 @@ cntry1 <-gsub(" Emirates", "-Emirates", cntry1)
 cntry1 <-gsub(" & ", "-&-", cntry1)
 cntry1 <-gsub("Puerto ", "Puerto-", cntry1)
 cntry1 <-gsub("Costa ", "Costa-", cntry1)
+cntry1 <-gsub("Czech Republic", "Czech-Republic", cntry1)
 
 freq_x <- sort(table(unlist(strsplit(cntry1, " "))),      # Create frequency table
                decreasing = TRUE)
 freq_x
 
-freq_x1 <- freq_x[freq_x>10]
+freq_x1 <- freq_x[freq_x>25] ## Can use other cutoffs also 10/40/50
 
+###### Countrywise retraction pattern
 cntry_freq <-ggplot(as.data.frame(freq_x1), aes(y=Var1, x= Freq, fill = Var1)) + 
   geom_col()+
   theme_bw()+ labs(y = "Country", x = "Number of Studies")+ 
-  theme(legend.position = "none")
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
 cntry_freq
-ggsave(cntry_freq, file = "./Documents/Retraction/Country_frequency.jpeg", width = 12, height = 8, units = "in", dpi=200)
+ggsave(cntry_freq, file = "Country_frequency_new.jpeg", width = 9, height = 6, units = "in", dpi=200)
 
-####################################################################################################
+################################################################################################################
+######## Country culture and retraction relation
+country_cltr <- read_xlsx("Country_list_updated 07112023.xlsx") |> drop_na(Individualism)
+head(country_cltr)
+colnames(country_cltr) <- gsub(" \r\n", "_", colnames(country_cltr))
+
+cltr_pca <- prcomp(country_cltr[,5:10])
+cor.test(country_cltr$Freq, cltr_pca$x[,3]) ###only significant
+country_cltr$pca3 <- cltr_pca$x[,3]
+
+pca_plot <- ggplot(country_cltr,aes(x= pca3, y= log(Freq)))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme_bw() + labs(y = "Log(Number of retractions)", x= "PCA axis 3")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+lng_ornt_plot <- ggplot(country_cltr,aes(x= Longterm_orientation, y= log(Freq)))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme_bw() + labs(y = "Log(Number of retractions)", x= "Longterm_orientation")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+ggsave(lng_ornt_plot, filename = "Freq_wlongornt.jpeg", width = 6, height = 4, units = "in", dpi=300)
+
+plot_grid(pca_plot, lng_ornt_plot, ncol = 2, labels = c("A", "B"), label_size = 20)
+ggsave( filename = "Freq_wculture.jpeg", width = 8, height = 4, units = "in", dpi=300)
+#############################################################################################################
 ##### Counting frequency of the reasons
 
 rsn_db <-capture.output(cat(rtr_db$Reason))
@@ -58,6 +97,28 @@ reason_freq <-ggplot(freq_rsn_new, aes(y=Var1, x= Freq, fill = Var1)) +
 reason_freq
 
 ggsave(reason_freq, file = "./Documents/Retraction/Reason_frequency.jpeg", width = 12, height = 8, units = "in", dpi=200)
+
+
+###### Aggregated subject list summary
+rsn_freq_new<-read_xlsx("Reason_frequency_26122023_SB.xlsx") |>drop_na(`New label`) |>arrange(desc(Freq))
+  head(rsn_freq_new)
+ 
+rsn_sum <- rsn_freq_new |> group_by(`New label`) |> summarise(total=sum(Freq)) |>arrange(total)
+
+#Then turn it back into a factor with the levels in the correct order
+rsn_sum$`New label` <- factor(rsn_sum$`New label`, levels=unique(rsn_sum$`New label`))
+
+#agg_sub_list |> #filter(Freq >5)|> order_by(`new category`)
+rsn_sum |>
+  ggplot( aes(x= total, y= `New label`))+
+  geom_col(aes(fill= `New label`))+
+  theme_bw()+
+  labs(y = "Reasons for retraction", x= "Number of papers")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+ggsave("Reason_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
 
 ####################################################################################################
 ###### Number of Authors and reasons
@@ -102,6 +163,7 @@ freq_athr1 <- freq_athr |> filter(Freq >10) |>
 freq_athr1
 write.csv(freq_athr, "./Documents/Retraction/Author-list.csv")
 
+#####################################################################################################################
 #### create networks of the authors
 library(statnet)
 rtr_db_filatr <- rtr_db |> filter(num_authr >1)
@@ -141,6 +203,21 @@ rtr_db$timediff <- as.numeric(rtr_db$RetractionDate - rtr_db$OriginalPaperDate, 
 rtr_pubyr <- rtr_db |> count(year = pubyear)
 rtr_rtryr <- rtr_db |> count(year = rtryear)
 
+rtr_year_ptrn <- rtr_rtryr |>   filter( year >=1975)|>
+  ggplot(aes(x= year))+ 
+  geom_line(aes(y= n), lwd=1, col ="brown") + 
+  #geom_line(aes(y=rollmean(n, 5, na.pad=TRUE)), linetype= "dashed") +
+  geom_smooth(aes(x=year, y= n), method = "gam", linetype= "dashed")+
+  #geom_line(aes(x= year, y= n.y), col ="blue", lwd=1, lty = 2) + 
+  labs(x= "Year" , y= "Number of publication", col = " ", lty= " ")+
+  theme_bw()+coord_cartesian(ylim = c(0,2100))+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=12),
+        legend.position = c(0.1,0.8),
+        legend.text = element_text(size=18))
+
+ggsave(rtr_year_ptrn, file = "Yearwise_pattern_wgam.jpeg", width = 9, height = 6, units = "in", dpi=300)
+
 rtr_yr <- full_join(rtr_pubyr, rtr_rtryr, by = "year") |> 
   pivot_longer(cols = c(n.x, n.y),
                names_to = c("type"),
@@ -152,7 +229,7 @@ year_pattern <- rtr_yr |>   filter( year >=1975)|>
   geom_line(aes(x= year, y= value, col = type, lty = type), lwd=1) + 
   #geom_line(aes(x= year, y= n.y), col ="blue", lwd=1, lty = 2) + 
   labs(x= "Year" , y= "Number of publication", col = " ", lty= " ")+
-  theme_bw()+
+  theme_bw()
   scale_color_discrete(labels = c("Published", "Retracted"))+
   scale_linetype_discrete(labels = c("Published", "Retracted"))+
   theme(axis.title = element_text(size=16),
@@ -194,3 +271,27 @@ freq_subject |> filter(Freq >10)|>
 
 ggsave("./Documents/Retraction/Subject_area_freq.jpeg", width = 10, height=15, units= "in", dpi=200)
 write.csv(freq_subject, "./Documents/Retraction/subject-list.csv" )
+
+###### Aggregated subject list summary
+agg_sub_list <- read_xlsx("subject-list_SB_27th December 2023.xlsx") |> 
+  drop_na(`new category`) |>arrange(desc(Freq))
+agg_sub_list$`new category` <- as.factor(agg_sub_list$`new category`)
+head(agg_sub_list)
+
+agg_sum <- agg_sub_list |> group_by(`new category`) |> summarise(total=sum(Freq)) |>arrange(total)
+
+#Then turn it back into a factor with the levels in the correct order
+agg_sum$`new category` <- factor(agg_sum$`new category`, levels=unique(agg_sum$`new category`))
+
+#agg_sub_list |> #filter(Freq >5)|> order_by(`new category`)
+  agg_sum |>
+  ggplot( aes(x= total, y= `new category`))+
+  geom_col(aes(fill= `new category`))+
+  theme_bw()+
+  labs(y = "Subject Area", x= "Number of papers")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+  
+  ggsave("Subject_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
+  
