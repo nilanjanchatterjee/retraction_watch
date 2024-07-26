@@ -300,17 +300,17 @@ agg_sum$`new category` <- factor(agg_sum$`new category`, levels=unique(agg_sum$`
   ### Relationship between the Journal IF and number of retractions
   
  jif_num <- read.csv("Journal_impact_factor_retraction_all.csv")
- jif_num <- jif_num |> drop_na(X2022.JIF) ###drop columns with NO IF information
+ jif_num_fltr <- jif_num |> drop_na(X2022.JIF) ###drop columns with NO IF information
   
-  summary(lm(log(n) ~ log(X2022.JIF) -1, data = jif_num)) ##Fitting the regression
+  summary(lm(log(n) ~ log(X2022.JIF) -1, data = jif_num_fltr)) ##Fitting the regression
   
-  jif_num |> drop_na(X2022.JIF) |> #plot the regression 
+  jif_num_fltr |> drop_na(X2022.JIF) |> #plot the regression 
     ggplot(aes(x= log(X2022.JIF), y = log(n)))+
     geom_point(alpha = 0.7) +
     geom_smooth( method = "gam", formula = y ~ (x)-1) + 
     coord_cartesian(ylim = c(0,6.5))+
     labs(x= "2022 Impact Factor", y= "Number of retractions") + 
-    annotate("text", x = -0.85, y=5.5 , label = bquote("R^2 == 0.408"), parse = TRUE)+
+    annotate("text", x = -0.85, y=5.5 , label = bquote("R^2 == 0.424"), parse = TRUE)+
     annotate("text", x = -0.85, y=5.2 , label = bquote("p <0.001"), parse = TRUE)+
     scale_x_continuous(breaks = c(-1.386,0, 1.61, 2.996,  3.912, 5.011),
                        labels = c( "0.25",  "1", "5", "20", "50", "150"))+
