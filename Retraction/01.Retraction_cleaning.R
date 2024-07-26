@@ -3,8 +3,8 @@ library(tidyverse)
 library(lubridate)
 library(cowplot)
 
-setwd("./Documents/Retraction")
-rtr_db <-read_xlsx("Data_life science_SB_12092023.xlsx")
+setwd("./..")
+rtr_db <-read_xlsx("./Retraction/Data_life science_SB_12092023.xlsx")
 head(rtr_db)
 summary(rtr_db)
 
@@ -295,3 +295,29 @@ agg_sum$`new category` <- factor(agg_sum$`new category`, levels=unique(agg_sum$`
   
   ggsave("Subject_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
   
+  
+########################################################################################
+  ### Relationship between the Journal IF and number of retractions
+  
+ jif_num <- read.csv("Journal_impact_factor_retraction_all.csv")
+ jif_num <- jif_num |> drop_na(X2022.JIF) ###drop columns with NO IF information
+  
+  summary(lm(log(n) ~ log(X2022.JIF) -1, data = jif_num)) ##Fitting the regression
+  
+  jif_num |> drop_na(X2022.JIF) |> #plot the regression 
+    ggplot(aes(x= log(X2022.JIF), y = log(n)))+
+    geom_point(alpha = 0.7) +
+    geom_smooth( method = "gam", formula = y ~ (x)-1) + 
+    coord_cartesian(ylim = c(0,6.5))+
+    labs(x= "2022 Impact Factor", y= "Number of retractions") + 
+    annotate("text", x = -0.85, y=5.5 , label = bquote("R^2 == 0.343"), parse = TRUE)+
+    annotate("text", x = -0.85, y=5.2 , label = bquote("p <0.001"), parse = TRUE)+
+    scale_x_continuous(breaks = c(-1.386,0, 1.61, 2.996,  3.912, 5.011),
+                       labels = c( "0.25",  "1", "5", "20", "50", "150"))+
+    scale_y_continuous(breaks = c(0, 1.61, 2.996,  4.61, 5.991),
+                       labels = c("1", "5", "20", "100", "400")) +
+    theme_bw() + 
+    theme(axis.title = element_text(size = 16),
+          axis.text = element_text(size=12)) 
+
+ggsave("JIF_freq_plot.jpeg", width = 8, height=5.5, units= "in", dpi=600)
