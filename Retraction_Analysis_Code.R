@@ -9,8 +9,7 @@ rtr_db <-read_xlsx("./Retraction/Data_life science_final.xlsx")
 head(rtr_db)
 summary(rtr_db)
 
-####################################################################################################
-###### Publication Time of the studies
+###### Publication Time of the retracted studies ----
 
 rtr_db$pubyear <- year(rtr_db$OriginalPaperDate)
 rtr_db$rtryear <- year(rtr_db$RetractionDate)
@@ -43,16 +42,14 @@ rtr_year_diff <- rtr_db |> filter( pubyear >=1975)|>
   labs(x = "Publication Year", 
        y = "Time between publication and retraction (months)") +
   scale_fill_discrete(breaks = c("1980", "1990", "2000", "2010", "2020"))+
-  theme_bw() + theme(axis.text = element_text(size=10),
+  coord_cartesian(ylim =c(0,550))+
+  theme_bw() + theme(axis.text = element_text(size=12),
                      axis.title.x = element_text(size=16))
 
-cowplot::plot_grid(rtr_year_ptrn, rtr_year_diff,
-                   labels = c("A", "B"))
+cowplot::plot_grid(rtr_year_ptrn, rtr_year_diff,     labels = c("A", "  B"))
 ggsave("./Figure/Final_figure_1.jpeg", width = 9, height = 4, dpi = 300, units = "in")
 
-
-################################################################################################
-###### Retraction Pattern across countries
+###### Retraction Pattern across countries ----
 
 cntry <-capture.output(cat(rtr_db$Country)) ###concatenate all country name together
 cntry1 <- gsub(";", " ", cntry)
@@ -85,8 +82,7 @@ cntry_freq <-ggplot(as.data.frame(freq_x1), aes(y=Var1, x= Freq, fill = Var1)) +
 cntry_freq
 #ggsave(cntry_freq, file = "Country_frequency_new.jpeg", width = 8, height = 6, units = "in", dpi=200)
 
-###############################################################
-###### Aggregated subject list summary
+###### Aggregated subject list summary -----
 agg_sub_list <- read_xlsx("./Retraction/subject_list_final.xlsx") |> 
   drop_na(`new category`) |>arrange(desc(Freq))
 agg_sub_list$`new category` <- as.factor(agg_sub_list$`new category`)
@@ -109,7 +105,6 @@ agg_sum_plt <- agg_sum |>
 
 #ggsave("Subject_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
 
-#####################################################################
 ###### Aggregated list of reasons -----
 rsn_freq_new<-read_xlsx("./Retraction/Reason_frequency_final.xlsx") |>
   drop_na(`New label`) |>arrange(desc(Freq))
@@ -133,8 +128,7 @@ rsn_db_plt <- rsn_sum |>
 
 #ggsave(rsn_db_plt, filename = "Reason_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
 
-#######################################################################
-#### Number of Authors
+#### Number of Authors across the studies ----
 #### Figure 2D Number of Authors----
 rtr_db$num_authr <- str_count(rtr_db$Author, ";") +1
 xtabs(~num_authr, rtr_db)
@@ -155,7 +149,6 @@ cowplot::plot_grid(cntry_freq, agg_sum_plt, rsn_db_plt, num_atr,
 
 ggsave("./Figure/Final_figure_2.jpeg", width=14, height =9, units = "in", dpi=300)
 
-########################################################################################
 ### Figure 3 Relationship between Journal IF and number of retractions ----
 
 jif_num <- read.csv("./Retraction/Journal_impact_factor_retraction_all.csv")
@@ -181,8 +174,7 @@ jif_num_fltr |> drop_na(X2022.JIF) |> #plot the regression
 
 ggsave("./Figure/Final_figure_3.jpeg", width = 8, height=5.5, units= "in", dpi=600)
 
-####################################################################################################
-###### Number of reasons for retraction
+###### Number of reasons for retraction ----
 
 rtr_db$num_reason <-str_count(rtr_db$Reason, ";")
 
