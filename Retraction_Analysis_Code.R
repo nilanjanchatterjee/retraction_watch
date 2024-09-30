@@ -3,6 +3,8 @@ library(tidyverse)
 library(lubridate)
 library(cowplot)
 library(igraph)
+library(statnet)
+library(ggraph)
 
 ### Load the data from the retraction watch database  
 rtr_db <-read_xlsx("./Retraction/Data_life science_final.xlsx")
@@ -173,6 +175,70 @@ jif_num_fltr |> drop_na(X2022.JIF) |> #plot the regression
         axis.text = element_text(size=12)) 
 
 ggsave("./Figure/Final_figure_3.jpeg", width = 8, height=5.5, units= "in", dpi=600)
+
+### Network of authors of the retracted articles ----
+
+authr_db <-capture.output(cat(rtr_db$Author)) ###create the author database
+freq_athr <- as.data.frame(sort(table(unlist( strsplit(authr_db, ";"))),      # Create frequency table
+                                decreasing = TRUE))
+
+rtr_db$num_authr <- str_count(rtr_db$Author, ";") +1 ##calculate the number of authors for each article
+rtr_db_filatr <- rtr_db |> filter(num_authr >1) ##filter articles with only one author
+rtr.coauthors = sapply(as.character(rtr_db_filatr$Author), strsplit, ";")
+#create record_id wise author list
+rtr.coauthors <- cbind(rtr_db$`Record ID`, unlist(sapply(as.character(rtr_db$Author), strsplit, ";")))
+rtr.coauthors <-  sapply(as.character(rtr_db$Author), strsplit, ";")
+coauthors = lapply(rtr.coauthors, trimws)
+
+###create unique oauthor lit
+coauthors.unique = unique(unlist(coauthors))[order(unique(unlist(coauthors)))]
+
+freq_athr1 <- freq_athr |> filter(Freq >5) ##filter author with less than 5 retractions
+##We have also done the same analysis with less than 3 authors
+bipartite.edges = lapply(coauthors, function(x) {freq_athr1$Var1 %in% x})
+bipartite.edges = do.call("cbind", bipartite.edges) # dimension is number of authors x number of papers
+rownames(bipartite.edges) = freq_athr1$Var1 #coauthors.unique
+
+#new_mat <- subset(kellogg.bipartite.edges, colSums(kellogg.bipartite.edges)>1)
+author.mat = bipartite.edges %*% t(bipartite.edges) #bipartite to unimode
+##create the author matrix of the retracted articles with the order from highest to lowest 
+mat = author.mat[order(rownames(author.mat)), order(rownames(author.mat))]
+
+### Convert the matrix into igraph format
+authors.ig1 <- graph_from_adjacency_matrix(mat, mode = "upper", diag = FALSE, 
+                                           weighted = TRUE)
+
+#mod_athr <-modularity(authors.ig, membership = athr_grp)
+deg_cntr <-centr_degree(authors.ig1, mode = "all")
+deg_cntr <- deg_cntr$res
+
+### Calculate the betweenness value of the graph
+bw.tbnet1 <- betweenness(mat) 
+V(authors.ig1)$betweenness <- bw.tbnet1 
+summary(bw.tbnet1)
+
+### Figure 4 network plot ----
+###Create layout for the plot and final plot 
+layout <- create_layout(authors.ig1, layout = 'igraph', algorithm = 'kk')
+layout$betweenness <- bw.tbnet1
+layout$degree <- deg_cntr
+
+lyt <- attributes(layout)
+df <-data.frame(lyt$graph)
+
+layout |> #filter(betweenness >0) |> 
+  ggraph(layout = "focus") + 
+  geom_edge_link0(colour = "grey70", alpha = 0.3) + 
+  geom_node_point( aes(col = log(betweenness/100 + 0.01),alpha = (1/1-0.1*degree),
+                       size = 0.1+2*sqrt(betweenness/500)),
+                   show.legend = FALSE) +
+  # geom_node_label(aes(label = 1:960), size = 0.001,
+  #                 repel = TRUE, show.legend = FALSE)+
+  scale_color_continuous(type = "viridis")+
+  theme_graph() +  ylim(-20, 20) +
+  xlim(-20, 20) 
+
+ggsave("./Figure/Final_figure_4.jpeg", width = 10, height = 10, units = "in", dpi=300)
 
 ###### Number of reasons for retraction ----
 
