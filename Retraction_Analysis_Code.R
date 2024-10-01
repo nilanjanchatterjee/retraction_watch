@@ -6,10 +6,11 @@ library(igraph)
 library(statnet)
 library(ggraph)
 
-### Load the data from the retraction watch database  
-rtr_db <-read_xlsx("./Retraction/Data_life science_final.xlsx")
+### Load the data downloaded from the retraction watch database  
+rtr_db <-read_csv("./Retraction/Retraction Watch Data_ Bio Science.csv")
 head(rtr_db)
 summary(rtr_db)
+glimpse(rtr_db)
 
 ###### Publication Time of the retracted studies ----
 
@@ -51,7 +52,7 @@ rtr_year_diff <- rtr_db |> filter( pubyear >=1975)|>
 cowplot::plot_grid(rtr_year_ptrn, rtr_year_diff,     labels = c("A", "  B"))
 ggsave("./Figure/Final_figure_1.jpeg", width = 9, height = 4, dpi = 300, units = "in")
 
-###### Retraction Pattern across countries ----
+## Retraction Pattern across countries ----
 
 cntry <-capture.output(cat(rtr_db$Country)) ###concatenate all country name together
 cntry1 <- gsub(";", " ", cntry)
@@ -85,8 +86,10 @@ cntry_freq
 #ggsave(cntry_freq, file = "Country_frequency_new.jpeg", width = 8, height = 6, units = "in", dpi=200)
 
 ###### Aggregated subject list summary -----
-agg_sub_list <- read_xlsx("./Retraction/subject_list_final.xlsx") |> 
-  drop_na(`new category`) |>arrange(desc(Freq))
+agg_sub_list <- read_xlsx("./Retraction/subject_list_fig2B.xlsx") |> 
+  drop_na(`new category`) |> 
+  arrange(desc(Freq))
+
 agg_sub_list$`new category` <- as.factor(agg_sub_list$`new category`)
 head(agg_sub_list)
 
@@ -107,8 +110,8 @@ agg_sum_plt <- agg_sum |>
 
 #ggsave("Subject_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
 
-###### Aggregated list of reasons -----
-rsn_freq_new<-read_xlsx("./Retraction/Reason_frequency_final.xlsx") |>
+## Aggregated list of reasons -----
+rsn_freq_new<-read_xlsx("./Retraction/Reason_frequency_fig2C.xlsx") |>
   drop_na(`New label`) |>arrange(desc(Freq))
 head(rsn_freq_new)
 
@@ -130,7 +133,7 @@ rsn_db_plt <- rsn_sum |>
 
 #ggsave(rsn_db_plt, filename = "Reason_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
 
-#### Number of Authors across the studies ----
+### Number of Authors across the studies ----
 #### Figure 2D Number of Authors----
 rtr_db$num_authr <- str_count(rtr_db$Author, ";") +1
 xtabs(~num_authr, rtr_db)
@@ -151,13 +154,14 @@ cowplot::plot_grid(cntry_freq, agg_sum_plt, rsn_db_plt, num_atr,
 
 ggsave("./Figure/Final_figure_2.jpeg", width=14, height =9, units = "in", dpi=300)
 
-### Figure 3 Relationship between Journal IF and number of retractions ----
+## Relationship between Journal IF and number of retractions ----
 
-jif_num <- read.csv("./Retraction/Journal_impact_factor_retraction_all.csv")
+jif_num <- read.csv("./Retraction/JIF_fig3.csv")
 jif_num_fltr <- jif_num |> drop_na(X2022.JIF) ###drop columns with NO IF information
 
 summary(lm(log(n) ~ log(X2022.JIF) -1, data = jif_num_fltr)) ##Fitting the regression
 
+### Figure 3 final plot ----
 jif_num_fltr |> drop_na(X2022.JIF) |> #plot the regression 
   ggplot(aes(x= log(X2022.JIF), y = log(n)))+
   geom_point(alpha = 0.7) +
@@ -176,7 +180,7 @@ jif_num_fltr |> drop_na(X2022.JIF) |> #plot the regression
 
 ggsave("./Figure/Final_figure_3.jpeg", width = 8, height=5.5, units= "in", dpi=600)
 
-### Network of authors of the retracted articles ----
+## Network of authors of the retracted articles ----
 
 authr_db <-capture.output(cat(rtr_db$Author)) ###create the author database
 freq_athr <- as.data.frame(sort(table(unlist( strsplit(authr_db, ";"))),      # Create frequency table
@@ -239,6 +243,57 @@ layout |> #filter(betweenness >0) |>
   xlim(-20, 20) 
 
 ggsave("./Figure/Final_figure_4.jpeg", width = 10, height = 10, units = "in", dpi=300)
+
+## Relation between retraction and cultures ----
+country_cltr <- read_csv("./Retraction/Country_culture_fig5.csv") |> drop_na(Individualism)
+head(country_cltr)
+#colnames(country_cltr) <- gsub(" \r\n", "_", colnames(country_cltr))
+
+### Individual plot with different variables
+lng_ornt_plot <- ggplot(country_cltr,aes(x= Longterm_orientation, y= log(Freq)))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  annotate("text", x = 25, y=8.5 , label = bquote("R^2 == 0.19"), parse = TRUE)+
+  annotate("text", x = 25, y= 8 , label = bquote("p <0.001"), parse = TRUE)+
+  theme_bw() + labs(y = "Log(Number of retractions)", x= "Longterm orientation")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+indvlsm_plot <- ggplot(country_cltr,aes(x= Individualism, y= log(Freq)))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  annotate("text", x = 25, y=8.5 , label = bquote("R^2 == 0.05"), parse = TRUE)+
+  annotate("text", x = 25, y=8 , label = bquote("p == 0.087"), parse = TRUE)+
+  theme_bw() + labs(y = "Log(Number of retractions)", x= "Individualism")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+pow_dist_plot <- ggplot(country_cltr,aes(x= `Power distance`, y= log(Freq)))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  annotate("text", x = 25, y=8.5 , label = bquote("R^2 == 0.014"), parse = TRUE)+
+  annotate("text", x = 25, y=8 , label = bquote("p == 0.36"), parse = TRUE)+
+  theme_bw() + labs(y = "Log(Number of retractions)", x= "Power distance")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+mtvn_suc_plot <- ggplot(country_cltr,aes(x= `Motovation_towards achivement and sucess`, y= log(Freq)))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  annotate("text", x = 25, y=8.5 , label = bquote("R^2 == 0.006"), parse = TRUE)+
+  annotate("text", x = 25, y=8 , label = bquote("p == 0.54"), parse = TRUE)+
+  theme_bw() + labs(y = "Log(Number of retractions)", x= "Motivation towards achivement and sucess")+
+  theme(axis.title = element_text(size=16),
+        axis.text  = element_text(size=10),
+        legend.position = "none")
+
+#### Final figure 5 Culture plot with different countries -----
+plot_grid( lng_ornt_plot, indvlsm_plot,pow_dist_plot, mtvn_suc_plot,
+           ncol = 2, labels = c("A", "B", "C", "D"), label_size = 20)
+ggsave(filename = "./Figure/Final_figure_5.jpeg", width = 12, height = 8, units = "in", dpi=300)
 
 ###### Number of reasons for retraction ----
 
