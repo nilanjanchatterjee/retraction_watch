@@ -5,7 +5,7 @@ library(cowplot)
 library(igraph)
 
 #setwd("./retraction_watch/")
-rtr_db <-read_xlsx("./Retraction/Data_life science_SB_12092023.xlsx")
+rtr_db <-read_xlsx("./Retraction/Retraction Watch Data_ Bio Science.xlsx")
 head(rtr_db)
 summary(rtr_db)
 
@@ -274,6 +274,11 @@ write.csv(freq_athr, "./Documents/Retraction/Author-list.csv")
 #####################################################################################################################
 #### create networks of the authors
 library(statnet)
+authr_db <-capture.output(cat(rtr_db$Author))
+freq_athr <- as.data.frame(sort(table(unlist( strsplit(authr_db, ";"))),      # Create frequency table
+                                decreasing = TRUE))
+
+rtr_db$num_authr <- str_count(rtr_db$Author, ";") +1
 rtr_db_filatr <- rtr_db |> filter(num_authr >1)
 rtr.coauthors = sapply(as.character(rtr_db_filatr$Author), strsplit, ";")
 #rtr.coauthors <- cbind(rtr_db$`Record ID`, (strsplit(rtr_db$Author, ";"))[[1]])
@@ -292,7 +297,7 @@ rownames(kellogg.bipartite.edges) = freq_athr1$Var1 #kellogg.coauthors.unique
 kellogg.mat = kellogg.bipartite.edges %*% t(kellogg.bipartite.edges) #bipartite to unimode
 mat = kellogg.mat[order(rownames(kellogg.mat)), order(rownames(kellogg.mat))]
 
-kellogg.statnet = as.network(kellogg.mat, directed = FALSE, names.eval = "edge.lwd", ignore.eval = FALSE)
+kellogg.statnet = as.network(author.mat, directed = FALSE, names.eval = "edge.lwd", ignore.eval = FALSE)
 kellogg.statnet ##view network summary
 plot.network(kellogg.statnet, edge.col = "gray", edge.lwd = "edge.lwd", 
              label = " ", 
@@ -303,7 +308,7 @@ jpeg(filename = "Social_network_rtr.jpeg", width = 12, height = 9, units = "in",
 plot.network(kellogg.statnet, edge.col = "gray", edge.lwd = "edge.lwd", label = " ", label.cex = .5, label.pad = 0, label.pos = 1)
 dev.off()
 
-authors.ig <- graph_from_adjacency_matrix(mat, mode = "upper", diag = FALSE, 
+authors.ig1 <- graph_from_adjacency_matrix(mat, mode = "upper", diag = FALSE, 
                                           weighted = TRUE)
 
 mod_athr <-modularity(authors.ig, membership = athr_grp)
@@ -311,21 +316,20 @@ deg_cntr <-centr_degree(authors.ig1, mode = "all")
 deg_cntr <- deg_cntr$res
 
 bw.tbnet1 <- betweenness(mat) 
-V(authors.ig1)$betweenness <- bw.tbnet 
-summary(bw.tbnet)
+V(authors.ig1)$betweenness <- bw.tbnet1 
+summary(bw.tbnet1)
 l.tbnet <- layout.kamada.kawai(authors.ig1) 
 # l.tbnet2 <- layout.kamada.kawai(tbnet2) 
 l.tbnet2 <- layout_as_star(authors.ig1) 
                           #weight.edge.lengths = edge_density(mat)/1000)
 
 par(cex.main=2)
-plot(groups, authors.ig1,vertex.label='', layout=l.tbnet2, 
+plot(groups1, authors.ig1,vertex.label='', layout=l.tbnet, 
      mark.groups = NULL,  #vertex.size = 9, # edge.color = memb.tbnet2, 
-     edge.width = 0.8, vertex.size=1+2*sqrt(bw.tbnet/500),
-     edge.)
+     edge.width = 0.8, vertex.size=1+2*sqrt(bw.tbnet1/500))
 
 ###### simulate modularity for graphs to compare 
-groups1 <-cluster_fast_greedy(authors.ig)
+groups1 <-cluster_fast_greedy(authors.ig1)
 athr_grp <- groups1$membership
 # Initialize vector to store values
 sims <- 1000
@@ -352,7 +356,7 @@ ggplot(data = as.data.frame(mod_vals), aes(x = mod_vals)) +
   theme_bw()
 
 layout <- create_layout(authors.ig1, layout = 'igraph', algorithm = 'kk')
-layout$betweenness <- bw.tbnet
+layout$betweenness <- bw.tbnet1
 layout$degree <- deg_cntr
 
 lyt <- attributes(layout)
@@ -361,14 +365,14 @@ df <-data.frame(lyt$graph)
 layout |> #filter(betweenness >0) |> 
   ggraph(layout = "focus") + 
   geom_edge_link0(colour = "grey70", alpha = 0.3) + 
-  geom_node_point(aes(col = log(betweenness/100 + 0.01),alpha = (1/1-0.1*degree),
-                      size = 0.1+2*sqrt(betweenness/500)), 
-                   show.legend = FALSE) + 
+  geom_node_point( aes(col = log(betweenness/100 + 0.01),alpha = (1/1-0.1*degree),
+                      size = 0.1+2*sqrt(betweenness/500)),
+                   show.legend = FALSE) +
   # geom_node_label(aes(label = 1:960), size = 0.001,
   #                 repel = TRUE, show.legend = FALSE)+
   scale_color_continuous(type = "viridis")+
-  theme_graph() #+  ylim(-20, 30) +
-  xlim(-20, 25) 
+  theme_graph() +  ylim(-20, 20) +
+  xlim(-20, 20) 
 
 ggsave("Author_network2.jpeg", width = 10, height = 10, units = "in", dpi=300)
 
