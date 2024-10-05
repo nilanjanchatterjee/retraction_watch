@@ -11,4 +11,3 @@ Data, analysis and figure results from the retraction watch data analysis on lif
 
 R Codes for the analysis can be found at the `Retraction_Analysis_Code.R` file in the repository
    
-Please contact Sabuj Bhattacharya *bhattacharyyasabuj@gmail.com* or Nilanjan Chatterjee *nilanjan.chatterjee@senckenberg.de* for any further queries or more information. 
