@@ -11,3 +11,5 @@ Data, analysis and figure results from the retraction watch data analysis on lif
 
 R Codes for the analysis can be found at the `Retraction_Analysis_Code.R` file in the repository
    
+Please cite the repository using the link below, 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13893654.svg)](https://doi.org/10.5281/zenodo.13893654)
