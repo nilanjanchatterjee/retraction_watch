@@ -113,7 +113,7 @@ agg_sum_plt <- agg_sum |>
 #ggsave("Subject_area_freq_new.jpeg", width = 7, height=5, units= "in", dpi=300)
 
 ## Aggregated list of reasons -----
-rsn_freq_new<-read_xlsx("./Retraction/Reason_frequency_fig2C.xlsx") |>
+rsn_freq_new<-read_csv("./Retraction/Data_fig_2C.csv") |>
   drop_na(`New label`) |>arrange(desc(Freq))
 head(rsn_freq_new)
 
@@ -137,6 +137,7 @@ rsn_db_plt <- rsn_sum |>
 
 ### Number of Authors across the studies ----
 #### Figure 2D Number of Authors----
+rtr_db_athr <- read.csv("./Retraction/Data_fig4_network.csv")
 rtr_db_athr$num_authr <- str_count(rtr_db_athr$Author, ";") +1
 xtabs(~num_authr, rtr_db_athr)
 
@@ -307,10 +308,10 @@ ggsave(filename = "./Figure/Final_figure_5.jpeg", width = 12, height = 8, units 
 
 ###### Number of reasons for retraction ----
 
-rtr_db$num_reason <-str_count(rtr_db_athr$`Retraction Reason`, ";")
+rtr_reason <- read.csv("./Retraction/Data_figS1.csv")
 
 #### Supplementary figure S1 ----
-num_rsn <- rtr_db |> count(num_reason) |>
+num_rsn <- rtr_reason |>
   ggplot( aes(x= as.factor(num_reason), y = n))+
   geom_col(fill= "blue")+
   theme_bw()+

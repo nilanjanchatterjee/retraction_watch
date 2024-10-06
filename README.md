@@ -6,10 +6,11 @@ Data, analysis and figure results from the retraction watch data analysis on lif
 1. `Data_fig1.csv` - Data set of article *record_id* from retraction watch (https://retractionwatch.com/) database with information of original and retraction article time
 2. `Country_fig2A.csv` - Frequency of author affiliations of the retracted articles for different countries
 3. `Subject_list_fig2B.xlsx` - Reclassified subject area of the retracted articles
-4. `Reason_frequency_fig2C.xlsx` - Reclassified reasons of retraction from the actual data
+4. `Data_fig2C.csv` - Reclassified reasons of retraction from the actual data
 5. `JIF_fig3.csv` - Journal impact factor (2022) with the journal name and frequency of retracted articles.
-6. `Data_fig2_4_S1.csv` - Data set of article *record_id* from retraction watch (https://retractionwatch.com/), author names and reasons for retraction
+6. `Data_fig4_network.csv` - Data set of article *record_id* from retraction watch (https://retractionwatch.com/), author names 
 7. `Country_culture_fig5.csv` - Retraction frequency with different cultural aspects of the country
+8. `Data_figS1.csv` - Number of reasons and frequency of retracted articles
 
 R Codes for the analysis can be found at the `Retraction_Analysis_Code.R` file in the repository
    
