@@ -7,7 +7,7 @@ library(statnet)
 library(ggraph)
 
 ### Load the data downloaded from the retraction watch database  
-rtr_db <-read_csv("./Retraction/Retraction Watch Data_ Bio Science.csv")
+rtr_db <-read_csv("./Retraction/Data_fig1.csv")
 head(rtr_db)
 summary(rtr_db)
 glimpse(rtr_db)
@@ -54,29 +54,31 @@ ggsave("./Figure/Final_figure_1.jpeg", width = 9, height = 4, dpi = 300, units =
 
 ## Retraction Pattern across countries ----
 
-cntry <-capture.output(cat(rtr_db$Country)) ###concatenate all country name together
-cntry1 <- gsub(";", " ", cntry)
-cntry1 <-gsub("United ", "United-", cntry1)
-cntry1 <-gsub("Hong ", "Hong-", cntry1)
-cntry1 <-gsub("South ", "South-", cntry1)
-cntry1 <-gsub("North ", "North-", cntry1)
-cntry1 <-gsub("Sri ", "Sri-", cntry1)
-cntry1 <-gsub("Saudi ", "Saudi-", cntry1)
-cntry1 <-gsub("New ", "New-", cntry1)
-cntry1 <-gsub(" Emirates", "-Emirates", cntry1)
-cntry1 <-gsub(" & ", "-&-", cntry1)
-cntry1 <-gsub("Puerto ", "Puerto-", cntry1)
-cntry1 <-gsub("Costa ", "Costa-", cntry1)
-cntry1 <-gsub("Czech Republic", "Czech-Republic", cntry1)
+# cntry <-capture.output(cat(rtr_db$Country)) ###concatenate all country name together
+# cntry1 <- gsub(";", " ", cntry)
+# cntry1 <-gsub("United ", "United-", cntry1)
+# cntry1 <-gsub("Hong ", "Hong-", cntry1)
+# cntry1 <-gsub("South ", "South-", cntry1)
+# cntry1 <-gsub("North ", "North-", cntry1)
+# cntry1 <-gsub("Sri ", "Sri-", cntry1)
+# cntry1 <-gsub("Saudi ", "Saudi-", cntry1)
+# cntry1 <-gsub("New ", "New-", cntry1)
+# cntry1 <-gsub(" Emirates", "-Emirates", cntry1)
+# cntry1 <-gsub(" & ", "-&-", cntry1)
+# cntry1 <-gsub("Puerto ", "Puerto-", cntry1)
+# cntry1 <-gsub("Costa ", "Costa-", cntry1)
+# cntry1 <-gsub("Czech Republic", "Czech-Republic", cntry1)
+# 
+# freq_x <- sort(table(unlist(strsplit(cntry1, " "))),      # Create frequency table
+#                decreasing = TRUE)
+freq_x <- read.csv("./Retraction/Country_fig2A.csv")
 
-freq_x <- sort(table(unlist(strsplit(cntry1, " "))),      # Create frequency table
-               decreasing = TRUE)
-freq_x
-
-freq_x1 <- freq_x[freq_x>25] ## Can use other cutoffs also 10/40/50
+freq_x1 <- freq_x[freq_x$Freq>25,] ## Can use other cutoffs also 10/40/50
+freq_x1 <- freq_x1[order(freq_x1$Freq, decreasing = TRUE),]
+freq_x1$Var1 <- factor(freq_x1$Var1, levels = freq_x1$Var1)
 
 ###### Figure 2A Country wise retraction pattern -----
-cntry_freq <-ggplot(as.data.frame(freq_x1), aes(y=Var1, x= Freq, fill = Var1)) + 
+cntry_freq <-ggplot(freq_x1, aes(y=Var1, x= Freq, fill = Var1)) + 
   geom_col()+
   theme_bw()+ labs(y = "Country", x = "Number of Studies")+ 
   theme(axis.title = element_text(size=16),
@@ -135,10 +137,10 @@ rsn_db_plt <- rsn_sum |>
 
 ### Number of Authors across the studies ----
 #### Figure 2D Number of Authors----
-rtr_db$num_authr <- str_count(rtr_db$Author, ";") +1
-xtabs(~num_authr, rtr_db)
+rtr_db_athr$num_authr <- str_count(rtr_db_athr$Author, ";") +1
+xtabs(~num_authr, rtr_db_athr)
 
-num_atr <- rtr_db |> count(num_authr) |> filter(!is.na(num_authr)) |>
+num_atr <- rtr_db_athr |> count(num_authr) |> filter(!is.na(num_authr)) |>
   ggplot( aes(x= as.factor(num_authr), y = n))+
   geom_col(fill= "blue")+
   theme_bw()+
@@ -182,16 +184,16 @@ ggsave("./Figure/Final_figure_3.jpeg", width = 8, height=5.5, units= "in", dpi=6
 
 ## Network of authors of the retracted articles ----
 
-authr_db <-capture.output(cat(rtr_db$Author)) ###create the author database
+authr_db <-capture.output(cat(rtr_db_athr$Author)) ###create the author database
 freq_athr <- as.data.frame(sort(table(unlist( strsplit(authr_db, ";"))),      # Create frequency table
                                 decreasing = TRUE))
 
-rtr_db$num_authr <- str_count(rtr_db$Author, ";") +1 ##calculate the number of authors for each article
-rtr_db_filatr <- rtr_db |> filter(num_authr >1) ##filter articles with only one author
+rtr_db$num_authr <- str_count(rtr_db_athr$Author, ";") +1 ##calculate the number of authors for each article
+rtr_db_filatr <- rtr_db_athr |> filter(num_authr >1) ##filter articles with only one author
 rtr.coauthors = sapply(as.character(rtr_db_filatr$Author), strsplit, ";")
 #create record_id wise author list
-rtr.coauthors <- cbind(rtr_db$`Record ID`, unlist(sapply(as.character(rtr_db$Author), strsplit, ";")))
-rtr.coauthors <-  sapply(as.character(rtr_db$Author), strsplit, ";")
+rtr.coauthors <- cbind(rtr_db_athr$`Record ID`, unlist(sapply(as.character(rtr_db_athr$Author), strsplit, ";")))
+rtr.coauthors <-  sapply(as.character(rtr_db_athr$Author), strsplit, ";")
 coauthors = lapply(rtr.coauthors, trimws)
 
 ###create unique oauthor lit
@@ -207,6 +209,14 @@ rownames(bipartite.edges) = freq_athr1$Var1 #coauthors.unique
 author.mat = bipartite.edges %*% t(bipartite.edges) #bipartite to unimode
 ##create the author matrix of the retracted articles with the order from highest to lowest 
 mat = author.mat[order(rownames(author.mat)), order(rownames(author.mat))]
+
+author_ntwrk = as.network(mat, directed = FALSE, names.eval = "edge.lwd", ignore.eval = FALSE)
+author_ntwrk ##view network summary
+
+##Plot network
+plot.network(author_ntwrk, edge.col = "gray", edge.lwd = "edge.lwd", 
+             label = " ", 
+             label.cex = .5, label.pad = 0, label.pos = 1, jitter = TRUE)
 
 ### Convert the matrix into igraph format
 authors.ig1 <- graph_from_adjacency_matrix(mat, mode = "upper", diag = FALSE, 
@@ -297,7 +307,7 @@ ggsave(filename = "./Figure/Final_figure_5.jpeg", width = 12, height = 8, units 
 
 ###### Number of reasons for retraction ----
 
-rtr_db$num_reason <-str_count(rtr_db$Reason, ";")
+rtr_db$num_reason <-str_count(rtr_db_athr$`Retraction Reason`, ";")
 
 #### Supplementary figure S1 ----
 num_rsn <- rtr_db |> count(num_reason) |>
