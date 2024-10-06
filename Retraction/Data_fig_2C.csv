@@ -1,0 +1,105 @@
+Actual reason,New label,Freq,percentage
+Notice - No/Limited Information,Other,589,1.554951292
+Author Unresponsive,Publication Integrity,614,1.620950923
+Bias Issues or Lack of Balance,Publication Integrity,24,0.063359645
+Breach of Policy by Author,Ethical and Regulatory compliance issue,521,1.375432298
+Breach of Policy by Third Party,Ethical and Regulatory compliance issue,4,0.010559941
+Cites Retracted Work,Publication Integrity,65,0.171599039
+Civil Proceedings,Other,18,0.047519734
+Complaints about Author,Ethical and Regulatory compliance issue,26,0.068639616
+Complaints about Company/Institution,Ethical and Regulatory compliance issue,2,0.00527997
+Complaints about Third Party,Ethical and Regulatory compliance issue,5,0.013199926
+Concerns/Issues about Authorship,Publication Integrity,454,1.198553288
+Concerns/Issues about Data,Data Integrity,2061,5.44100953
+Concerns/Issues about Image,Image Integrity,882,2.328466961
+Concerns/Issues about Referencing/Attributions,Publication Integrity,214,0.564956836
+Concerns/Issues about Results,Data Integrity,446,1.177433406
+Concerns/Issues about Third Party Involvement,Ethical and Regulatory compliance issue,91,0.240238655
+Conflict of Interest,Conflict of Interest,177,0.467277383
+Contamination of Cell Lines/Tissues,Experiment or study quality Issue,90,0.237598669
+Contamination of Materials (General),Experiment or study quality Issue,45,0.118799335
+Contamination of Reagents,Experiment or study quality Issue,12,0.031679823
+Copyright Claims,Publication Integrity,228,0.601916629
+Criminal Proceedings,Ethical and Regulatory compliance issue,18,0.047519734
+Date of Retraction/Other Unknown,Other,852,2.249267404
+Doing the Right Thing,Other,52,0.137279231
+Duplicate Publication through Error by Journal/Publisher,Publication Integrity,189,0.498957206
+Duplication of Article,Publication Integrity,807,2.130468069
+Duplication of Data,Data Integrity,421,1.111433776
+Duplication of Image,Image Integrity,2437,6.433643972
+Duplication of Text,Text Integrity,189,0.498957206
+Error by Journal/Publisher,Publication Integrity,226,0.596636659
+Error by Third Party,Experiment or study quality Issue,25,0.06599963
+Error in Analyses,Data Integrity,461,1.217033185
+Error in Cell Lines/Tissues,Study Quality Issue,71,0.18743895
+Error in Data,Data Integrity,788,2.08030835
+Error in Image,Image Integrity,519,1.370152327
+Error in Materials (General),Study Quality Issue,110,0.290398374
+Error in Methods,Study Quality Issue,483,1.275112859
+Error in Results and/or Conclusions,Study Quality Issue,531,1.40183215
+Error in Text,Text Integrity,157,0.414477679
+Ethical Violations by Author,Ethical and Regulatory compliance issue,287,0.757675757
+Ethical Violations by Third Party,Ethical and Regulatory compliance issue,20,0.052799704
+Euphemisms for Duplication,Publication Integrity,245,0.646796378
+Euphemisms for Misconduct,Publication Integrity,20,0.052799704
+Euphemisms for Plagiarism,Text Integrity,523,1.380712268
+Fake Peer Review,Publication Integrity,930,2.455186251
+False Affiliation,Publication Integrity,42,0.110879379
+FALSE/Forged Authorship,Publication Integrity,273,0.720715964
+Falsification/Fabrication of Data,Data Integrity,718,1.895509385
+Falsification/Fabrication of Image,Image Integrity,406,1.071833998
+Falsification/Fabrication of Results,Data Integrity,52,0.137279231
+Hoax Paper,Publication Integrity,3,0.007919956
+Informed/Patient Consent - None/Withdrawn,Ethical and Regulatory compliance issue,59,0.155759128
+Investigation by Company/Institution,Ethical and Regulatory compliance issue,1432,3.780458829
+Investigation by Journal/Publisher,Ethical and Regulatory compliance issue,1817,4.796853138
+Investigation by ORI,Ethical and Regulatory compliance issue,231,0.609836585
+Investigation by Third Party,Ethical and Regulatory compliance issue,1364,3.600939835
+Lack of Approval from Author,Ethical and Regulatory compliance issue,191,0.504237176
+Lack of Approval from Company/Institution,Ethical and Regulatory compliance issue,83,0.219118773
+Lack of Approval from Third Party,Ethical and Regulatory compliance issue,118,0.311518255
+Lack of IRB/IACUC Approval,Ethical and Regulatory compliance issue,206,0.543836955
+Legal Reasons/Legal Threats,Ethical and Regulatory compliance issue,42,0.110879379
+Manipulation of Images,Image Integrity,896,2.365426754
+Manipulation of Results,Data Integrity,29,0.076559571
+Miscommunication by Author,Ethical and Regulatory compliance issue,47,0.124079305
+Miscommunication by Company/Institution,Ethical and Regulatory compliance issue,4,0.010559941
+Miscommunication by Journal/Publisher,Ethical and Regulatory compliance issue,9,0.023759867
+Miscommunication by Third Party,Ethical and Regulatory compliance issue,7,0.018479897
+Misconduct - Official Investigation/Finding,Ethical and Regulatory compliance issue,698,1.842709681
+Misconduct by Author,Ethical and Regulatory compliance issue,829,2.188547744
+Misconduct by Company/Institution,Ethical and Regulatory compliance issue,5,0.013199926
+Misconduct by Third Party,Ethical and Regulatory compliance issue,16,0.042239763
+No Further Action,Other,2,0.00527997
+Nonpayment of Fees/Refusal to Pay,Publication Integrity,4,0.010559941
+Notice - Limited or No Information,Other,1503,3.96789778
+Notice - Unable to Access via current resources,Other,85,0.224398743
+Objections by Author(s),Ethical and Regulatory compliance issue,239,0.630956467
+Objections by Company/Institution,Ethical and Regulatory compliance issue,17,0.044879749
+Objections by Third Party,Ethical and Regulatory compliance issue,411,1.085033924
+Original Data Not Provided,Data Integrity,965,2.547585734
+Paper Mill,Publication Integrity,1329,3.508540352
+Plagiarism of Article,Publication Integrity,600,1.58399113
+Plagiarism of Data,Data Integrity,138,0.36431796
+Plagiarism of Image,Image Integrity,160,0.422397635
+Plagiarism of Text,Text Integrity,464,1.22495314
+Publishing Ban,Other,21,0.05543969
+Randomly Generated Content,Publication Integrity,252,0.665276274
+Results Not Reproducible,Study Quality Issue,608,1.605111011
+Retract and Replace,Publication Integrity,131,0.345838063
+Rogue Editor,Publication Integrity,236,0.623036511
+Sabotage of Materials,Study Quality Issue,1,0.002639985
+Salami Slicing,Data Integrity,10,0.026399852
+Taken from Dissertation/Thesis,Publication Integrity,35,0.092399483
+Taken via Peer Review,Publication Integrity,2,0.00527997
+Temporary Removal,Other,5,0.013199926
+Transfer of Copyright/Ownership,Publication Integrity,3,0.007919956
+Unreliable Data,Data Integrity,682,1.800469917
+Unreliable Image,Image Integrity,146,0.385437842
+Unreliable Results,Study Quality Issue,1738,4.588294306
+Updated to Retraction,Other,12,0.031679823
+Upgrade/Update of Prior Notice,Other,660,1.742390243
+Withdrawal,Other,692,1.82686977
+Withdrawn (out of Date),Other,5,0.013199926
+Withdrawn to Publish in Different Journal,Other,91,0.240238655
+Notice - No/Limited Information,Other,18,0.047519734
