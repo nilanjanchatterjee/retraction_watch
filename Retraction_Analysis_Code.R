@@ -28,7 +28,7 @@ rtr_year_ptrn <- rtr_rtryr |>   filter( year >=1975)|>
   #geom_line(aes(y=rollmean(n, 5, na.pad=TRUE)), linetype= "dashed") +
   geom_smooth(aes(x=year, y= n), method = "gam", linetype= "dashed")+
   #geom_line(aes(x= year, y= n.y), col ="blue", lwd=1, lty = 2) + 
-  labs(x= "Publication Year" , y= "Number of publication", col = " ", lty= " ")+
+  labs(x= "Publication Year" , y= "Number of publications", col = " ", lty= " ")+
   theme_bw()+coord_cartesian(ylim = c(0,2100))+
   theme(axis.title = element_text(size=16),
         axis.text  = element_text(size=12),
@@ -80,7 +80,7 @@ freq_x1$Var1 <- factor(freq_x1$Var1, levels = freq_x1$Var1)
 ###### Figure 2A Country wise retraction pattern -----
 cntry_freq <-ggplot(freq_x1, aes(y=Var1, x= Freq, fill = Var1)) + 
   geom_col()+
-  theme_bw()+ labs(y = "Country", x = "Number of Studies")+ 
+  theme_bw()+ labs(y = "Country", x = "Number of retracted studies")+ 
   theme(axis.title = element_text(size=16),
         axis.text  = element_text(size=10),
         legend.position = "none")
@@ -105,7 +105,7 @@ agg_sum_plt <- agg_sum |>
   ggplot( aes(x= total, y= `new category`))+
   geom_col(aes(fill= `new category`))+
   theme_bw()+
-  labs(y = "Subject Area", x= "Number of papers")+
+  labs(y = "Subject Area", x= "Number of papers retracted")+
   theme(axis.title = element_text(size=16),
         axis.text  = element_text(size=10),
         legend.position = "none")
@@ -128,7 +128,7 @@ rsn_db_plt <- rsn_sum |>
   ggplot( aes(x= total, y= `New label`))+
   geom_col(aes(fill= `New label`))+
   theme_bw()+
-  labs(y = "Reasons for retraction", x= "Number of papers")+
+  labs(y = "Reasons for retraction", x= "Number of retracted papers")+
   theme(axis.title = element_text(size=16),
         axis.text  = element_text(size=10),
         legend.position = "none")
@@ -145,7 +145,7 @@ num_atr <- rtr_db_athr |> count(num_authr) |> filter(!is.na(num_authr)) |>
   ggplot( aes(x= as.factor(num_authr), y = n))+
   geom_col(fill= "blue")+
   theme_bw()+
-  labs(x= "Number of Authors", y= "Number of papers")+
+  labs(x= "Number of Authors", y= "Number of retracted papers")+
   theme(axis.title = element_text(size=16),
         axis.text  = element_text(size=12))
 num_atr
@@ -315,7 +315,7 @@ num_rsn <- rtr_reason |>
   ggplot( aes(x= as.factor(num_reason), y = n))+
   geom_col(fill= "blue")+
   theme_bw()+
-  labs(x= "Number of reasons", y= "Number of papers")+
+  labs(x= "Number of reasons", y= "Number of retracted papers")+
   theme(axis.title = element_text(size=16),
         axis.text  = element_text(size=12))
 
