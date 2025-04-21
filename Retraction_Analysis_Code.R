@@ -6,6 +6,9 @@ library(igraph)
 library(statnet)
 library(ggraph)
 
+### The script loads data of retractions from retraction watch and performs 
+### different analysis reported in the manuscript
+
 ### Load the data downloaded from the retraction watch database  
 rtr_db <-read_csv("./Retraction/Data_fig1.csv")
 head(rtr_db)
