@@ -1,4 +1,5 @@
 Data, analysis and figure results from the retraction watch data analysis on life sciences.The Raw data for retraction of Biological Science articles used in this study has been obtained through data use agreement with Retraction Watch(https://retractionwatch.com). All request for the master raw data file can be directly sent to retraction watch team. The corresponding author of the current article can help with queries specific to the current article and the processed datasets.
+Further information about the repository and citation details can be found at https://doi.org/10.5281/zenodo.13893653. 
 
 -  The `Retraction` folder contains the data for the analysis 
 -  The `Figure` folder contains the output result figures 
